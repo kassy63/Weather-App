@@ -1,6 +1,6 @@
 import React from "react";
 
-const WeatherBox = ({ weather }) => {
+const WeatherInfo = ({ weather }) => {
   return (
     <div className="weather-box">
       <div>{weather?.name}</div>
@@ -14,4 +14,4 @@ const WeatherBox = ({ weather }) => {
   );
 };
 
-export default WeatherBox;
+export default WeatherInfo;

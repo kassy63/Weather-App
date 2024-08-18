@@ -1,8 +1,9 @@
 import { useEffect, useState } from "react";
 import "./App.css";
 import "bootstrap/dist/css/bootstrap.min.css";
-import WeatherBox from "./component/WeatherBox";
+import WeatherInfo from "./component/WeatherInfo";
 import WeatherButton from "./component/WeatherButton";
+import ClipLoader from "react-spinners/ClipLoader";
 
 // API DOCS: https://openweathermap.org/current
 // 1. 앱이 실행되자마자 현재위치기반의 날씨가 보인다
@@ -16,16 +17,35 @@ function App() {
   const APIkey = "2f993bc610067493615249b425872332";
 
   const [weather, setWeather] = useState(null);
+  const [city, setCity] = useState("");
+  // const cities = ["Paris", "New York", "Tokyo", "Seoul"];
+  const cities = [
+    { city: "Paris", translation: "파리" },
+    { city: "New York", translation: "뉴욕" },
+    { city: "Tokyo", translation: "도쿄" },
+    { city: "Seoul", translation: "서울" },
+  ];
+  const [loading, setLoading] = useState(false);
+  const [color, setColor] = useState("#ffffff");
 
   useEffect(() => {
-    getCurrentLocation();
-  }, []);
+    if (city === "") {
+      getCurrentLocation();
+    } else {
+      getWeatherByCity();
+    }
+  }, [city]);
+
+  // useEffect(() => {
+  //   console.log("city?", city);
+  // }, [city]);
 
   const getCurrentLocation = () => {
     navigator.geolocation.getCurrentPosition((position) => {
       const lat = position.coords.latitude;
       const lon = position.coords.longitude;
       getWeatherByCurrentLocation(lat, lon);
+      setCity(""); // 현재 위치일 때는 city를 빈 문자열로 설정
     });
   };
 
@@ -40,9 +60,24 @@ function App() {
   const getWeatherByCurrentLocation = async (lat, lon) => {
     const url = `https://api.openweathermap.org/data/2.5/weather?lat=${lat}&lon=${lon}&appid=${APIkey}&lang=kr&units=metric`;
     try {
+      setLoading(true);
       const response = await fetch(url);
       const data = await response.json();
       setWeather(data);
+      setLoading(false);
+      // console.log("data", data);
+    } catch (error) {
+      console.error("날씨 데이터를 가져오는 데 실패:", error);
+    }
+  };
+  const getWeatherByCity = async () => {
+    const url = `https://api.openweathermap.org/data/2.5/weather?q=${city}&appid=${APIkey}&lang=kr&units=metric`;
+    try {
+      setLoading(true);
+      const response = await fetch(url);
+      const data = await response.json();
+      setWeather(data);
+      setLoading(false);
       // console.log("data", data);
     } catch (error) {
       console.error("날씨 데이터를 가져오는 데 실패:", error);
@@ -51,10 +86,27 @@ function App() {
 
   return (
     <div>
-      <div className="container">
-        <WeatherBox weather={weather} />
-        <WeatherButton />
-      </div>
+      {loading ? (
+        <div className="container">
+          <ClipLoader
+            color={color}
+            loading={loading}
+            size={150}
+            aria-label="Loading Spinner"
+            data-testid="loader"
+          />
+        </div>
+      ) : (
+        <div className="container">
+          <WeatherInfo weather={weather} />
+          <WeatherButton
+            cities={cities}
+            setCity={setCity}
+            getCurrentLocation={getCurrentLocation}
+            selectedCity={city}
+          />
+        </div>
+      )}
     </div>
   );
 }

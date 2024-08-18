@@ -1,24 +1,33 @@
 import React from "react";
 import { Button } from "react-bootstrap";
 
-const WeatherButton = () => {
+const WeatherButton = ({
+  cities,
+  setCity,
+  getCurrentLocation,
+  selectedCity,
+}) => {
   return (
-    <div>
-      <Button variant="warning">
+    <div className="button-box">
+      <Button
+        variant={selectedCity === "" ? "primary" : "warning"} // 현재 위치 버튼에 대한 효과
+        onClick={getCurrentLocation}
+      >
         현재위치
         <br />
         Current Location
       </Button>
-      <Button variant="warning">
-        파리
-        <br />
-        Paris
-      </Button>
-      <Button variant="warning">
-        뉴욕
-        <br />
-        New York
-      </Button>
+      {cities?.map((item, index) => (
+        <Button
+          variant={selectedCity === item.city ? "primary" : "warning"} // 선택된 도시에 대한 효과
+          key={index}
+          onClick={() => setCity(item.city)}
+        >
+          {item.city}
+          <br />
+          {item.translation}
+        </Button>
+      ))}
     </div>
   );
 };
