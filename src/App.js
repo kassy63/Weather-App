@@ -68,6 +68,7 @@ function App() {
       // console.log("data", data);
     } catch (error) {
       console.error("날씨 데이터를 가져오는 데 실패:", error);
+      setLoading(false); // 에러 발생 시 로딩 상태 해제
     }
   };
   const getWeatherByCity = async () => {
@@ -81,12 +82,13 @@ function App() {
       // console.log("data", data);
     } catch (error) {
       console.error("날씨 데이터를 가져오는 데 실패:", error);
+      setLoading(false); // 에러 발생 시 로딩 상태 해제
     }
   };
 
   return (
     <div>
-      {loading ? (
+      {loading || weather === null ? (
         <div className="container">
           <ClipLoader
             color={color}
